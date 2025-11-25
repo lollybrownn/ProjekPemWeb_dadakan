@@ -160,8 +160,8 @@
             </form>
         </div>
         <div style="text-align: center; margin-top: 20px;">
-            <p style="font-size: 14px; color: #555;">Belum punya akun? 
-                <a href="register.php" style="color: #000; font-weight: bold; text-decoration: none;">Register</a>
+            <p style="font-size: 14px; color: #555;">Sudah punya akun? 
+                <a href="register.php" style="color: #000; font-weight: bold; text-decoration: none;">Login</a>
             </p>
         </div>
     </div>
