@@ -10,7 +10,10 @@ session_start();
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f4f4; /* Latar belakang abu-abu muda */
+            background-image: url(asset/background.avif);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             display: flex;
             justify-content: center;
             align-items: flex-start; /* Mulai dari atas */
@@ -24,6 +27,7 @@ session_start();
             max-width: 450px; /* Lebar maksimal konten */
             background-color: white;
             padding: 40px 30px;
+            margin-bottom: 50px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sedikit bayangan */
             border-radius: 4px;
         }

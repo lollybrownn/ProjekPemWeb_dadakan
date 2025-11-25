@@ -60,7 +60,6 @@ $nama = htmlspecialchars($_SESSION['nama']);
             font-size: 0.95rem;
             color: #1a1a1a;
         }
-
         /* Hover buka dropdown di desktop (lebih smooth) */
         @media (min-width: 992px) {
             .dropdown:hover > .dropdown-menu {
