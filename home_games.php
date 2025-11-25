@@ -1,5 +1,7 @@
 <?php
-session_start();
+// Sertakan file koneksi database, meskipun belum digunakan di halaman ini, 
+// ini adalah praktik yang baik jika nanti Anda ingin mengambil data dari DB.
+include 'connection.php'; 
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: login.php"); 
@@ -25,7 +27,7 @@ $nama = htmlspecialchars($_SESSION['nama']);
         /* Navbar Utama */
         .navbar-main {
             z-index: 1050 !important;
-            background-image: url(asset/background-navbar.avif);
+            background-image: url(asset/background-navbar.png);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -155,11 +157,59 @@ $nama = htmlspecialchars($_SESSION['nama']);
             border-radius: 8px;
         }
 
+        /* NEW CALENDAR STYLING (Mengikuti tampilan kotak penuh) */
         .calendar-day {
-            width: 48px;
+            width: 80px; /* Ukuran kotak diperbesar */
             text-align: center;
-            padding: 10px 0;
+            padding: 5px; 
+            margin: 0 2px; /* Jarak antar kotak */
             border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent; /* Border default transparan */
+            background-color: #fff; /* Latar belakang putih */
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05); /* Bayangan kecil */
+        }
+        
+        .calendar-day:hover {
+            border-color: #ccc; /* Border saat hover */
+        }
+
+        .calendar-day.active {
+            background-color: #000;
+            color: #fff;
+            border-color: #000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+
+        .calendar-day .day-of-week {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #6c757d; /* Warna abu-abu untuk hari */
+            margin-bottom: 5px;
+        }
+
+        .calendar-day.active .day-of-week {
+            color: #fff; /* Putih saat aktif */
+        }
+
+        .calendar-day .date-number {
+            font-size: 2.2rem; /* Ukuran tanggal diperbesar */
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .calendar-day .game-count {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #dc3545; /* Warna merah untuk penanda games (contoh) */
+        }
+        
+        .calendar-day.active .game-count {
+            color: #ffc107; /* Warna kuning saat aktif */
         }
     </style>
 </head>
@@ -193,27 +243,32 @@ $nama = htmlspecialchars($_SESSION['nama']);
         <div
             class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-5 gap-4">
             <h2 class="fw-bold text-uppercase mb-0">NBA Games & Scores</h2>
-            <div class="d-flex flex-wrap align-items-center gap-4">
-                <div class="d-flex align-items-center gap-3">
-                    <span class="fw-bold">November 2025</span>
-                    <button class="btn btn-link text-dark p-0 fs-4">&lt;</button>
-                    <button class="btn btn-link text-dark p-0 fs-4">&gt;</button>
+            
+            <!-- Kontainer Utama Kalender -->
+            <div class="d-flex flex-column align-items-end">
+                <!-- Navigasi Bulan/Tahun & Tombol Hari Ini -->
+                <div class="d-flex align-items-center mb-3">
+                    <button class="btn btn-link text-dark p-0 fs-4" onclick="changeMonth(-1)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    <!-- ID untuk menampilkan Bulan dan Tahun secara dinamis -->
+                    <span class="fw-bold fs-5 mx-3" id="monthYearDisplay">November 2025</span> 
+                    <button class="btn btn-link text-dark p-0 fs-4" onclick="changeMonth(1)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                    <!-- Tombol Hari Ini (TODAY) -->
+                    <button class="btn btn-sm btn-outline-dark ms-4" onclick="selectToday()">TODAY</button>
                 </div>
-                <div class="d-flex gap-1 bg-white rounded-3 shadow-sm p-2">
-                    <div class="calendar-day"><small class="text-muted">Sun</small><br>23</div>
-                    <div class="calendar-day"><small class="text-muted">Mon</small><br>24</div>
-                    <div class="calendar-day today-box"><small class="text-muted">Tue</small><br><strong>25</strong>
-                    </div>
-                    <div class="calendar-day"><small class="text-muted">Wed</small><br>26</div>
-                    <div class="calendar-day"><small class="text-muted">Thu</small><br>27</div>
-                    <div class="calendar-day"><small class="text-muted">Fri</small><br>28</div>
-                    <div class="calendar-day"><small class="text-muted">Sat</small><br>29</div>
+
+                <!-- Kalender Harian Mini (7 Hari) -->
+                <div class="d-flex bg-white rounded-3 p-2 shadow-sm" id="calendarDaysContainer">
+                    <!-- Hari-hari akan dimasukkan di sini oleh JavaScript -->
                 </div>
             </div>
         </div>
 
-        <!-- GAME CARD 1 -->
-        <div class="game-card p-4 p-md-5">
+        <!-- GAME CARD 1 (Tanggal 2025-11-25) - Conto Data Spesifik -->
+        <div class="game-card p-4 p-md-5" data-date="2025-11-25">
             <div class="row g-5 align-items-center">
 
                 <!-- SKOR + LOGO TIM -->
@@ -289,33 +344,33 @@ $nama = htmlspecialchars($_SESSION['nama']);
             </div>
         </div>
 
-    <!-- GAME CARD 2 (contoh lagi) -->
-    <div class="game-card p-4 p-md-5">
-        <div class="row g-5 align-items-center">
-            <div class="col-lg-5">
-                <div class="d-flex justify-content-between align-items-center text-center">
-                    <div>
-                        <img src="https://cdn.nba.com/logos/nba/1610612739/primary/L/logo.svg" class="team-logo"
-                            alt="Cavaliers">
-                        <div class="mt-3 fw-bold fs-5">Cavaliers<br><small class="text-muted">12-7</small></div>
+        <!-- GAME CARD 2 (Tanggal 2025-11-25) - Conto Data Spesifik -->
+        <div class="game-card p-4 p-md-5" data-date="2025-11-25">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-5">
+                    <div class="d-flex justify-content-between align-items-center text-center">
+                        <div>
+                            <img src="https://cdn.nba.com/logos/nba/1610612739/primary/L/logo.svg" class="team-logo"
+                                alt="Cavaliers">
+                            <div class="mt-3 fw-bold fs-5">Cavaliers<br><small class="text-muted">12-7</small></div>
+                        </div>
+                        <div>
+                            <div class="score-big">99</div>
+                            <div class="final-text mt-2">FINAL</div>
+                            <div class="score-big mt-3">110</div>
+                        </div>
+                        <div>
+                            <img src="https://cdn.nba.com/logos/nba/1610612761/primary/L/logo.svg" class="team-logo"
+                                alt="Raptors">
+                            <div class="mt-3 fw-bold fs-5">Raptors<br><small class="text-muted">13-5</small></div>
+                        </div>
                     </div>
-                    <div>
-                        <div class="score-big">99</div>
-                        <div class="final-text mt-2">FINAL</div>
-                        <div class="score-big mt-3">110</div>
-                    </div>
-                    <div>
-                        <img src="https://cdn.nba.com/logos/nba/1610612761/primary/L/logo.svg" class="team-logo"
-                            alt="Raptors">
-                        <div class="mt-3 fw-bold fs-5">Raptors<br><small class="text-muted">13-5</small></div>
+                    <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
+                        <button class="btn btn-outline-dark rounded-pill px-5 py-2">Box Score</button>
                     </div>
                 </div>
-                <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
-                    <button class="btn btn-outline-dark rounded-pill px-5 py-2">Box Score</button>
-                </div>
-            </div>
-            <!-- Leaders & Recap bisa ditambahkan lagi -->
-             <div class="col-lg-4">
+                <!-- Leaders & Recap bisa ditambahkan lagi -->
+                <div class="col-lg-4">
                     <h5 class="text-center fw-bold mb-4 text-uppercase">Game Leaders</h5>
                     <div class="row text-center">
                         <div class="col-6">
@@ -357,23 +412,220 @@ $nama = htmlspecialchars($_SESSION['nama']);
                         <small class="text-muted">Full Game Highlights • 16:10</small>
                     </div>
                 </div>
+            </div>
         </div>
-    </div>
+        
+        <!-- Game card placeholder untuk semua tanggal di luar 25 November 2025 -->
+        <div class="game-card p-4 p-md-5" data-date="placeholder" style="display:none;">
+            <div class="text-center py-5">
+                <h3 class="fw-bold">Tidak Ada Pertandingan Terjadwal</h3>
+                <p class="text-muted">Cek lagi besok untuk jadwalnya!</p>
+            </div>
+        </div>
 
     </div>
 
     <!-- Script agar sub-navbar selalu menempel tepat di bawah navbar utama -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // --- 1. SETUP NAVIGASI & KALENDER ---
+        const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const WEEKDAYS = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+        
+        // Atur tanggal awal tampilan ke 25 November 2025 (berdasarkan contoh statis Anda)
+        // Kita menggunakan objek Date untuk mempermudah manipulasi tanggal
+        let selectedDate = new Date(2025, 10, 25); // Bulan ke-10 adalah November
+        const today = new Date(); // Tanggal hari ini
+
+        // Referensi DOM
+        const monthYearDisplay = document.getElementById('monthYearDisplay');
+        const calendarDaysContainer = document.getElementById('calendarDaysContainer');
+        const gameCards = document.querySelectorAll('.game-card');
+
+        // Data dummy untuk jumlah games (hanya untuk visual, tidak mempengaruhi konten)
+        // Kunci adalah tanggal dalam format YYYY-MM-DD, Nilai adalah jumlah games
+        const DUMMY_GAME_COUNTS = {
+            '2025-11-23': 8,
+            '2025-11-24': 10,
+            '2025-11-25': 3, // Tanggal dengan konten spesifik
+            '2025-11-26': 9,
+            '2025-11-27': 11,
+            '2025-11-28': 8,
+            '2025-11-29': 7,
+        };
+
+
+        // Fungsi untuk memformat tanggal menjadi YYYY-MM-DD
+        function formatDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+        
+        // Fungsi untuk menyaring dan menampilkan game card
+        function filterGames(dateString) {
+            let foundSpecificGame = false;
+            const placeholderCard = document.querySelector('.game-card[data-date="placeholder"]');
+
+            // Sembunyikan semua card (termasuk placeholder)
+            gameCards.forEach(card => {
+                card.style.display = 'none'; 
+            });
+
+            // Cari dan tampilkan game card yang spesifik untuk tanggal ini (misalnya 2025-11-25)
+            gameCards.forEach(card => {
+                const cardDate = card.getAttribute('data-date');
+                if (cardDate === dateString) {
+                    // Tampilkan card spesifik
+                    card.style.display = ''; 
+                    // Pastikan card spesifik bukan placeholder
+                    if (cardDate !== "placeholder") {
+                        foundSpecificGame = true;
+                    }
+                }
+            });
+            
+            // Jika tidak ada game spesifik yang ditemukan UNTUK TANGGAL INI, 
+            // atau jika card yang ditemukan adalah placeholder, 
+            // maka terapkan aturan baru: Tampilkan placeholder jika tanggal BUKAN 25 Nov.
+            
+            if (dateString !== '2025-11-25' && placeholderCard) {
+                // Aturan: Untuk semua tanggal selain 25 Nov, TAMPILKAN placeholder
+                placeholderCard.style.display = '';
+                // Sembunyikan semua card spesifik (meski sudah disembunyikan di awal, ini memastikan)
+                gameCards.forEach(card => {
+                     const cardDate = card.getAttribute('data-date');
+                    if (cardDate === '2025-11-25') {
+                        card.style.display = 'none';
+                    }
+                });
+
+            } else if (dateString === '2025-11-25') {
+                 // Aturan: Untuk tanggal 25 Nov, TAMPILKAN game spesifik, sembunyikan placeholder
+                gameCards.forEach(card => {
+                    if (card.getAttribute('data-date') === '2025-11-25') {
+                        card.style.display = '';
+                    } else if (card.getAttribute('data-date') === 'placeholder') {
+                        card.style.display = 'none';
+                    }
+                });
+            } else {
+                 // Logika fallback default (seharusnya tidak tercapai)
+                 if (placeholderCard) {
+                    placeholderCard.style.display = '';
+                 }
+            }
+        }
+
+        // Fungsi untuk menggambar hari-hari dalam kalender mini (7 hari)
+        function renderCalendar() {
+            // Hapus isi container kalender sebelumnya
+            calendarDaysContainer.innerHTML = ''; 
+
+            // Atur tanggal awal tampilan kalender (3 hari sebelum tanggal yang dipilih)
+            let startDate = new Date(selectedDate);
+            startDate.setDate(selectedDate.getDate() - 3);
+
+            // Update tampilan bulan dan tahun
+            monthYearDisplay.textContent = `${MONTHS[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+            
+            const todayFormatted = formatDate(today);
+
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(startDate);
+                day.setDate(startDate.getDate() + i);
+
+                const dayIndex = day.getDay();
+                const dayText = WEEKDAYS[dayIndex];
+                const dateText = day.getDate();
+                const dateFormatted = formatDate(day);
+                
+                // Ambil data games dummy (atau 0 jika tidak ada)
+                const gameCount = DUMMY_GAME_COUNTS[dateFormatted] || 0;
+                
+                // Tambahkan elemen hari
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('calendar-day', 'd-flex', 'flex-column', 'justify-content-center', 'align-items-center');
+                dayDiv.setAttribute('data-date', dateFormatted);
+                
+                // Tambahkan kelas 'active' jika ini adalah tanggal yang dipilih
+                if (dateFormatted === formatDate(selectedDate)) {
+                    dayDiv.classList.add('active');
+                }
+
+                // Tambahkan kelas 'today-box' jika ini adalah hari ini
+                if (dateFormatted === todayFormatted) {
+                    // Hanya tambahkan penanda visual, tidak mempengaruhi logika active
+                    // dayDiv.classList.add('today-box'); 
+                }
+                
+                // Struktur HTML baru
+                dayDiv.innerHTML = `
+                    <div class="day-of-week">${dayText}</div>
+                    <div class="date-number">${dateText}</div>
+                    <div class="game-count text-danger">${gameCount > 0 ? gameCount + ' GAMES' : 'OFF'}</div>
+                `;
+                
+                // Tambahkan event listener untuk memilih hari
+                dayDiv.addEventListener('click', () => selectDate(day));
+                
+                calendarDaysContainer.appendChild(dayDiv);
+            }
+            
+            // Setelah kalender dirender, filter game yang sesuai dengan tanggal yang dipilih
+            filterGames(formatDate(selectedDate));
+        }
+        
+        // Fungsi untuk memilih tanggal (ketika mengklik hari di kalender)
+        function selectDate(date) {
+            selectedDate = date;
+            renderCalendar(); // Render ulang kalender untuk memperbarui status 'active' dan game
+        }
+
+        // Fungsi untuk pindah ke hari ini
+        function selectToday() {
+            selectedDate = new Date();
+            renderCalendar();
+        }
+
+        // Fungsi untuk mengubah bulan (ketika mengklik tombol < atau >)
+        function changeMonth(direction) {
+            // Ubah tanggal yang dipilih ke tanggal yang sama di bulan berikutnya atau sebelumnya
+            selectedDate.setMonth(selectedDate.getMonth() + direction);
+            
+            // Periksa apakah bulan berubah. Jika ya, setel tanggal ke tgl 15 untuk tampilan tengah
+            const newMonth = selectedDate.getMonth();
+            const currentMonth = new Date().getMonth();
+            
+            // Jika tanggal yang dipilih saat ini tidak ada di bulan baru (misalnya dari 31 Jan ke Feb)
+            // setDate akan otomatis menyesuaikan (misalnya menjadi 2 Mar). Kita kembalikan ke tgl 15.
+            if (newMonth !== (currentMonth + direction) % 12) {
+                 selectedDate.setDate(15);
+            }
+
+            renderCalendar(); 
+        }
+
+        // --- 2. LOGIKA LAYOUT NAVIGASI ---
         function adjustSubNavbar() {
             const main = document.querySelector('.navbar-main');
             const sub = document.getElementById('subNavbar');
             if (main && sub) {
+                // Atur posisi sub-navbar tepat di bawah navbar utama
                 sub.style.top = main.offsetHeight + 'px';
+                // Atur padding body agar konten tidak tertutup oleh kedua navbar
                 document.body.style.paddingTop = (main.offsetHeight + sub.offsetHeight + 30) + 'px';
             }
         }
-        window.addEventListener('load', adjustSubNavbar);
+        
+        // Inisialisasi pada saat load
+        window.addEventListener('load', () => {
+            adjustSubNavbar();
+            renderCalendar(); // Render kalender pertama kali
+        });
+        
+        // Atur ulang pada saat resize
         window.addEventListener('resize', adjustSubNavbar);
     </script>
 </body>
