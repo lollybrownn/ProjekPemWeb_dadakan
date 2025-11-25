@@ -1,14 +1,16 @@
 <?php
 session_start();
+include "connection.php";
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("Location: login.php"); 
+    header("Location: login.php");
     exit;
 }
 $nama = htmlspecialchars($_SESSION['nama']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,12 +28,13 @@ $nama = htmlspecialchars($_SESSION['nama']);
         }
         
         .teams-dropdown {
-            width: 360px !important;     /* khusus Teams saja */
+            width: 360px !important;
+            /* khusus Teams saja */
             max-height: 80vh;
             overflow-y: auto;
             overflow-x: hidden;
             padding: 0.5rem 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
         /* Dropdown lain (Games, dll) tetap normal */
@@ -68,9 +71,10 @@ $nama = htmlspecialchars($_SESSION['nama']);
             font-size: 0.95rem;
             color: #1a1a1a;
         }
+
         /* Hover buka dropdown di desktop (lebih smooth) */
         @media (min-width: 992px) {
-            .dropdown:hover > .dropdown-menu {
+            .dropdown:hover>.dropdown-menu {
                 display: block;
             }
         }
