@@ -319,7 +319,7 @@
                             <img src="https://cdn.nba.com/headshots/nba/latest/260x190/1627742.png" class="leader-img"
                                 alt="Brandon Ingram">
                             <p class="mt-2 mb-0 fw-bold small">Brandon Ingram</p>
-                            <p class="text-muted small">TOR #43 • SF</p>
+                            <p class="text-muted small">TOR #3 • SF</p>
                             <div class="d-flex justify-content-center gap-3 mt-2">
                                 <div><strong>37</strong><br><small>PTS</small></div>
                                 <div><strong>7</strong><br><small>REB</small></div>
