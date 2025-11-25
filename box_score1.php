@@ -87,7 +87,7 @@
         <!-- GAME HEADER -->
         <div class="game-header">
             <h1>
-                CLEVELAND CAVALIERS <span class="score-win">135</span> – <span class="score-lose">116</span> TORONTO RAPTORS
+                CLEVELAND CAVALIERS <span class="score-win">99</span> – <span class="score-lose">110</span> TORONTO RAPTORS
             </h1>
             <p class="text-muted fs-5">Monday, November 24, 2025 • Final • Scotiabank Arena, Toronto</p>
         </div>
