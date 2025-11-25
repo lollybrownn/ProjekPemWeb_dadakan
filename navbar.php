@@ -59,7 +59,11 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">News</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="home_games.php">Home</a></li>
+                            <li><a class="dropdown-item" href="news.php">Latest</a></li>
+                            <li><a class="dropdown-item" href="news.php">Breaking News</a></li>
+                            <li><a class="dropdown-item" href="news.php">Teams</a></li>
+                            <li><a class="dropdown-item" href="news.php">Players</a></li>
+                            <li><a class="dropdown-item" href="news.php">Analysis</a></li>
                         </ul>
                     </li>
                 </ul>
