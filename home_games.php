@@ -224,7 +224,7 @@
 
                     <!-- Tombol hanya Box Score & Game Details -->
                     <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
-                        <button class="btn btn-outline-dark rounded-pill px-5 py-2">Box Score</button>
+                        <a href="box_score.php"><button class="btn btn-outline-dark rounded-pill px-5 py-2">Box Score</button></a>
                     </div>
                 </div>
 
@@ -297,7 +297,7 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
-                    <button class="btn btn-outline-dark rounded-pill px-5 py-2">Box Score</button>
+                    <a href="box_score.php"><button class="btn btn-outline-dark rounded-pill px-5 py-2">Box Score</button></a>
                 </div>
             </div>
             <!-- Leaders & Recap bisa ditambahkan lagi -->
