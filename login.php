@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -141,17 +144,26 @@
         <p class="instruction">
             Enter your email address and password to get started.
         </p>
-
+        <?php 
+            if (isset($_SESSION['login_error'])) {
+                echo '<p style="color: red; text-align: center; font-weight: bold;">' . $_SESSION['login_error'] . '</p>';
+                unset($_SESSION['login_error']);
+            }
+            if (isset($_SESSION['registration_success'])) {
+                echo '<p style="color: green; text-align: center; font-weight: bold;">' . $_SESSION['registration_success'] . '</p>';
+                unset($_SESSION['registration_success']); 
+            }
+        ?>
         <div class="form-box">
-            <form action="#" method="POST">
+            <form action="login_proses.php" method="POST">
                 <div class="input-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required placeholder=" ">
+                    <input type="email" id="email" name="email" required placeholder="Masukkan Email">
                 </div>
                 
                 <div class="input-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required placeholder=" ">
+                    <input type="password" id="password" name="password" required placeholder="Masukkan Password">
                 </div>
 
                 <button type="submit" class="btn-continue">

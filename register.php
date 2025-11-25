@@ -131,7 +131,7 @@
             <div class="logo">
                 <img src="asset/logo1.png" alt="NBA Logo" style="height: 120px; width: 120px;">
             </div>
-            <h1>SIGN IN YOUR ACCOUNT</h1>
+            <h1>SIGN UP YOUR ACCOUNT</h1>
         </div>
         
         <p class="description">
@@ -143,15 +143,21 @@
         </p>
 
         <div class="form-box">
-            <form action="#" method="POST">
+            <?php 
+                if (isset($_SESSION['registration_error'])) {
+                    echo '<p style="color: red; text-align: center; font-weight: bold;">' . $_SESSION['registration_error'] . '</p>';
+                    unset($_SESSION['registration_error']); 
+                }
+            ?>
+            <form action="register_proses.php" method="POST">
                 <div class="input-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required placeholder=" ">
+                    <input type="email" id="email" name="email" required placeholder="Masukkan Email">
                 </div>
                 
                 <div class="input-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required placeholder=" ">
+                    <input type="password" id="password" name="password" required placeholder="Masukkan Password">
                 </div>
 
                 <button type="submit" class="btn-continue">
@@ -161,7 +167,7 @@
         </div>
         <div style="text-align: center; margin-top: 20px;">
             <p style="font-size: 14px; color: #555;">Sudah punya akun? 
-                <a href="register.php" style="color: #000; font-weight: bold; text-decoration: none;">Login</a>
+                <a href="login.php" style="color: #000; font-weight: bold; text-decoration: none;">Login</a>
             </p>
         </div>
     </div>
