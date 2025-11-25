@@ -56,6 +56,12 @@
                             <li><a class="dropdown-item team-item" href="https://www.nba.com/jazz"><img src="https://cdn.nba.com/logos/nba/1610612762/primary/L/logo.svg" alt="UTA"> Utah Jazz</a></li>
                         </ul>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">News</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="home_games.php">Home</a></li>
+                        </ul>
+                    </li>
                 </ul>
                 <form class="d-flex">
                     <button class="btn btn-outline-success me-2" type="button"><a href="login.php" class="button-sigin">Sign In</a></button>
