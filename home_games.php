@@ -1,11 +1,49 @@
 <?php
 session_start();
 
+// Set timezone ke Asia/Jakarta (WIB) untuk memastikan tanggal lokal yang benar
+date_default_timezone_set('Asia/Jakarta');
+
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: login.php"); 
     exit;
 }
 $nama = htmlspecialchars($_SESSION['nama']);
+
+// --- LOGIKA KALENDER DINAMIS DAN NAVIGASI ---
+
+// 1. Tentukan tanggal yang sedang dilihat (displayDate)
+$today = new DateTime('now'); // Tanggal hari ini
+$todayCheck = $today->format('Y-m-d'); 
+
+if (isset($_GET['date']) && !empty($_GET['date'])) {
+    // Ambil tanggal dari parameter URL
+    try {
+        $displayDate = new DateTime($_GET['date']);
+    } catch (Exception $e) {
+        // Jika tanggal di URL tidak valid, kembali ke hari ini
+        $displayDate = clone $today;
+    }
+} else {
+    // Default: gunakan tanggal hari ini
+    $displayDate = clone $today;
+}
+
+$displayDateCheck = $displayDate->format('Y-m-d');
+$monthYear = $displayDate->format('F Y');
+
+// 2. Hitung tanggal mulai untuk tampilan 7 hari (3 hari sebelum displayDate)
+$startDate = clone $displayDate;
+$startDate->modify('-3 days');
+
+// 3. Hitung tanggal untuk navigasi (Prev Day dan Next Day)
+$prevDate = clone $displayDate;
+$prevDate->modify('-1 day');
+$prevDateUrl = 'home_games.php?date=' . $prevDate->format('Y-m-d');
+
+$nextDate = clone $displayDate;
+$nextDate->modify('+1 day');
+$nextDateUrl = 'home_games.php?date=' . $nextDate->format('Y-m-d');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,7 +63,7 @@ $nama = htmlspecialchars($_SESSION['nama']);
         /* Navbar Utama */
         .navbar-main {
             z-index: 1050 !important;
-            background-image: url(asset/background-navbar.avif);
+            background-image: url(asset/background-navbar.png);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -154,12 +192,29 @@ $nama = htmlspecialchars($_SESSION['nama']);
             color: #000;
             border-radius: 8px;
         }
+        
+        .selected-date {
+            background: #000 !important; /* Warna latar belakang untuk tanggal yang dipilih */
+            color: #fff !important; /* Warna teks untuk tanggal yang dipilih */
+            border: 2px solid #000 !important;
+        }
+        
+        /* Jika tanggal yang dipilih juga adalah hari ini, gabungkan gaya */
+        .today-box.selected-date {
+            background: #007bff !important; /* Contoh warna lain untuk hari ini yang dipilih */
+            border-color: #007bff !important;
+        }
 
         .calendar-day {
             width: 48px;
             text-align: center;
             padding: 10px 0;
             border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .calendar-day:hover:not(.selected-date) {
+            background-color: #e9ecef;
         }
     </style>
 </head>
@@ -189,30 +244,78 @@ $nama = htmlspecialchars($_SESSION['nama']);
     <!-- ISI HALAMAN -->
     <div class="container my-5">
 
-        <!-- Header + Calendar -->
+        <!-- Header + Calendar (Dinamic Section) -->
         <div
             class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-5 gap-4">
             <h2 class="fw-bold text-uppercase mb-0">NBA Games & Scores</h2>
             <div class="d-flex flex-wrap align-items-center gap-4">
                 <div class="d-flex align-items-center gap-3">
-                    <span class="fw-bold">November 2025</span>
-                    <button class="btn btn-link text-dark p-0 fs-4">&lt;</button>
-                    <button class="btn btn-link text-dark p-0 fs-4">&gt;</button>
+                    <!-- Tampilkan Bulan dan Tahun dari tanggal yang dipilih -->
+                    <span class="fw-bold"><?php echo $monthYear; ?></span>
+                    
+                    <!-- Tombol Navigasi Harian (menggunakan URL parameter) -->
+                    <a href="<?php echo $prevDateUrl; ?>" class="text-decoration-none">
+                        <button class="btn btn-link text-dark p-0 fs-4">&lt;</button>
+                    </a>
+                    <a href="<?php echo $nextDateUrl; ?>" class="text-decoration-none">
+                        <button class="btn btn-link text-dark p-0 fs-4">&gt;</button>
+                    </a>
                 </div>
+                
+                <!-- Kalender 7 Hari Dinamis -->
                 <div class="d-flex gap-1 bg-white rounded-3 shadow-sm p-2">
-                    <div class="calendar-day"><small class="text-muted">Sun</small><br>23</div>
-                    <div class="calendar-day"><small class="text-muted">Mon</small><br>24</div>
-                    <div class="calendar-day today-box"><small class="text-muted">Tue</small><br><strong>25</strong>
-                    </div>
-                    <div class="calendar-day"><small class="text-muted">Wed</small><br>26</div>
-                    <div class="calendar-day"><small class="text-muted">Thu</small><br>27</div>
-                    <div class="calendar-day"><small class="text-muted">Fri</small><br>28</div>
-                    <div class="calendar-day"><small class="text-muted">Sat</small><br>29</div>
+                    <?php 
+                    $currentDay = clone $startDate; // Mulai dari tanggal 3 hari sebelum tanggal yang dipilih
+                    for ($i = 0; $i < 7; $i++) {
+                        $dayName = $currentDay->format('D'); 
+                        $dayNum = $currentDay->format('d'); 
+                        $dateToCheck = $currentDay->format('Y-m-d'); 
+
+                        $classes = '';
+                        $is_selected = ($dateToCheck === $displayDateCheck);
+                        
+                        // Cek apakah ini tanggal hari ini (Today)
+                        if ($dateToCheck === $todayCheck) {
+                            $classes .= ' today-box';
+                        }
+                        
+                        // Cek apakah ini tanggal yang sedang dipilih (Selected)
+                        if ($is_selected) {
+                            $classes .= ' selected-date';
+                        }
+                        
+                        // Tentukan kelas warna teks berdasarkan apakah tanggal dipilih atau tidak
+                        // Jika dipilih, gunakan text-white. Jika tidak, gunakan text-muted untuk small, dan text-dark untuk strong.
+                        $smallTextColor = $is_selected ? 'text-white' : 'text-muted';
+                        $strongTextColor = $is_selected ? 'text-white' : 'text-dark';
+
+                        // Tentukan link untuk memilih tanggal ini
+                        $dateLink = 'home_games.php?date=' . $dateToCheck;
+
+                        echo '<a href="' . $dateLink . '" class="text-decoration-none">';
+                        echo '<div class="calendar-day ' . trim($classes) . '">';
+                        // Gunakan $smallTextColor untuk Day Name
+                        echo '<small class="' . $smallTextColor . '">' . $dayName . '</small><br>';
+                        // Gunakan $strongTextColor untuk Day Number
+                        echo '<strong class="' . $strongTextColor . '">' . $dayNum . '</strong>';
+                        echo '</div>';
+                        echo '</a>';
+
+                        $currentDay->modify('+1 day'); // Maju ke hari berikutnya
+                    }
+                    ?>
                 </div>
+                <!-- Tombol Kembali ke Hari Ini (Tambahan) -->
+                <?php if ($displayDateCheck !== $todayCheck): ?>
+                    <a href="home_games.php" class="btn btn-outline-secondary rounded-pill btn-sm">Today</a>
+                <?php endif; ?>
             </div>
         </div>
 
-        <!-- GAME CARD 1 -->
+        <!-- Konten Game: Sesuaikan Judul dengan Tanggal yang Dipilih -->
+        <h3 class="mb-4">Games on <?php echo $displayDate->format('l, F j, Y'); ?></h3>
+
+        <!-- GAME CARD 1 (Data Statis - Anda akan mengganti ini dengan data dinamis berdasarkan $displayDate) -->
         <div class="game-card p-4 p-md-5">
             <div class="row g-5 align-items-center">
 
@@ -289,7 +392,7 @@ $nama = htmlspecialchars($_SESSION['nama']);
             </div>
         </div>
 
-    <!-- GAME CARD 2 (contoh lagi) -->
+    <!-- GAME CARD 2 (contoh lagi - Data Statis) -->
     <div class="game-card p-4 p-md-5">
         <div class="row g-5 align-items-center">
             <div class="col-lg-5">
@@ -365,11 +468,14 @@ $nama = htmlspecialchars($_SESSION['nama']);
     <!-- Script agar sub-navbar selalu menempel tepat di bawah navbar utama -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Fungsi untuk menyesuaikan posisi sub-navbar dan padding body
         function adjustSubNavbar() {
             const main = document.querySelector('.navbar-main');
             const sub = document.getElementById('subNavbar');
             if (main && sub) {
+                // Set posisi top sub-navbar tepat di bawah navbar utama
                 sub.style.top = main.offsetHeight + 'px';
+                // Tambah padding ke body agar konten tidak tertutup
                 document.body.style.paddingTop = (main.offsetHeight + sub.offsetHeight + 30) + 'px';
             }
         }
