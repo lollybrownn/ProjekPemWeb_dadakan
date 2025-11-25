@@ -1,3 +1,12 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: login.php"); 
+    exit;
+}
+$nama = htmlspecialchars($_SESSION['nama']);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,6 +25,11 @@
         /* Navbar Utama */
         .navbar-main {
             z-index: 1050 !important;
+            background-image: url(asset/background-navbar.avif);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: transparent !important;
         }
 
         #subNavbar {

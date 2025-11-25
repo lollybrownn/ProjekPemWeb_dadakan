@@ -17,6 +17,14 @@ $nama = htmlspecialchars($_SESSION['nama']);
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <style>
         /* Hanya dropdown Teams yang lebar + scrollable */
+        .navbar-main {
+            background-image: url(asset/background-navbar.avif);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: transparent !important;
+        }
+        
         .teams-dropdown {
             width: 360px !important;     /* khusus Teams saja */
             max-height: 80vh;
