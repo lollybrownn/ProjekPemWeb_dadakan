@@ -88,7 +88,6 @@ $next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
-        /* Dropdown lain (Games, dll) tetap normal */
         .dropdown-menu:not(.teams-dropdown) {
             width: auto;
             max-height: none;
@@ -123,7 +122,6 @@ $next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
             color: #1a1a1a;
         }
 
-        /* Hover buka dropdown di desktop (lebih smooth) */
         @media (min-width: 992px) {
             .dropdown:hover>.dropdown-menu {
                 display: block;

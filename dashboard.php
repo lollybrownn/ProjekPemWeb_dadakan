@@ -114,7 +114,7 @@ $video = $conn->query("
             color: #1a1a1a;
         }
 
-        /* Hover buka dropdown di desktop (lebih smooth) */
+        /* Hover buka dropdown di desktop */
         @media (min-width: 992px) {
             .dropdown:hover>.dropdown-menu {
                 display: block;
@@ -126,7 +126,7 @@ $video = $conn->query("
 
 <?php include "navbar.php" ?>
 
-<!-- SELAMAT DATANG + VIDEO HIGHLIGHT (PAKAI IFRAME LANGSUNG) -->
+<!-- SELAMAT DATANG + VIDEO HIGHLIGHT  -->
 <div class="welcome-section text-center">
     <div class="container">
         <h1 class="display-4 fw-bold text-dark mb-3">Selamat Datang!</h1>
@@ -160,7 +160,7 @@ $video = $conn->query("
     </div>
 </div>
 
-<!-- MENU UTAMA (HANYA 2) -->
+<!-- MENU UTAMA -->
 <div class="container py-5">
     <div class="row g-5 justify-content-center">
         <div class="col-lg-5">

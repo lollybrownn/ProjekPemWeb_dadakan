@@ -92,11 +92,11 @@ $next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
             text-align:left !important;
         }
         .player-img {
-            width:28px;  /* Ukuran small sesuai permintaan */
+            width:28px;
             height:28px;
             border-radius:50%;
             object-fit:cover;
-            border:1px solid #444;  /* Border tipis untuk clean */
+            border:1px solid #444;
             flex-shrink:0;
         }
         .totals-row {
@@ -133,14 +133,12 @@ $next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
-        /* Dropdown lain (Games, dll) tetap normal */
         .dropdown-menu:not(.teams-dropdown) {
             width: auto;
             max-height: none;
             overflow: visible;
         }
 
-        /* Logo + nama tim rapi */
         .team-item {
             display: flex !important;
             align-items: center;
@@ -168,14 +166,12 @@ $next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
             color: #1a1a1a;
         }
 
-        /* Hover buka dropdown di desktop (lebih smooth) */
         @media (min-width: 992px) {
             .dropdown:hover>.dropdown-menu {
                 display: block;
             }
         }
 
-        /* Responsive */
         @media (max-width:992px) {
             .box-table { font-size:0.85rem; }
             .player-img { width:24px; height:24px; }  /* Bahkan lebih small di tablet */
@@ -194,7 +190,7 @@ $next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
 <div class="main-content">
     <div class="container">
 
-        <!-- VIDEO HIGHLIGHT (Sesuai NBA.com highlights untuk game ini) -->
+        <!-- VIDEO HIGHLIGHT -->
         <div class="hero-video ratio ratio-16x9">
             <iframe src="https://www.youtube.com/embed/lSK-01qq9rM?autoplay=1&mute=1&loop=1&playlist=lSK-01qq9rM&controls=1&rel=0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
