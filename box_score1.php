@@ -54,6 +54,65 @@
         .plus { color:#28a745; font-weight:700; }
         .minus { color:#dc3545; font-weight:700; }
         .dnp { color:#777; font-style:italic; text-align:center; padding:10px !important; }
+        .navbar-main {
+            background-image: url(asset/background-navbar.png);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: transparent !important;
+        }
+        
+        .teams-dropdown {
+            width: 360px !important;
+            /* khusus Teams saja */
+            max-height: 80vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0.5rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Dropdown lain (Games, dll) tetap normal */
+        .dropdown-menu:not(.teams-dropdown) {
+            width: auto;
+            max-height: none;
+            overflow: visible;
+        }
+
+        /* Logo + nama tim rapi */
+        .team-item {
+            display: flex !important;
+            align-items: center;
+            gap: 12px;
+            padding: 0.45rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .team-item img {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .team-item:hover {
+            background-color: #f8f9fa;
+            color: #0d6efd !important;
+            border-radius: 6px;
+        }
+
+        .dropdown-header {
+            padding-left: 1.5rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1a1a1a;
+        }
+
+        /* Hover buka dropdown di desktop (lebih smooth) */
+        @media (min-width: 992px) {
+            .dropdown:hover>.dropdown-menu {
+                display: block;
+            }
+        }
 
         @media (max-width:992px) {
             .box-table { font-size:0.85rem; }
