@@ -31,7 +31,7 @@ $next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
 
         /* Navbar Utama (sama seperti di home_games.php) */
         .navbar-main {
-            z-index: 1;
+            z-index: 3;
             background-image: url(asset/background-navbar1.png);
             background-position: center;
             background-repeat: no-repeat;
@@ -125,7 +125,7 @@ $next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
     <?php include "navbar.php"; ?>
 
     <!-- SUB-NAVBAR NEWS (mirip Games & Scores) -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom" id="subNavbar" style="z-index: 0;" ">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom" id="subNavbar" style="z-index: 1;" ">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold fs-4 text-dark mb-0">News</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#subnavNews">
