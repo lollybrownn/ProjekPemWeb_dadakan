@@ -150,7 +150,7 @@ $next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
 
         <!-- VIDEO HIGHLIGHT -->
         <div class="hero-video ratio ratio-16x9">
-            <iframe src="https://www.youtube.com/embed/jwye6qMzxLU?autoplay=1&mute=1&loop=1&playlist=jwye6qMzxLU&controls=1&rel=0"
+            <iframe src="https://www.youtube.com/embed/jwye6qMzxLU"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
 
