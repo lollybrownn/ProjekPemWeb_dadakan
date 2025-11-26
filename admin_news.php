@@ -5,6 +5,17 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
+// Buat folder upload jika belum ada
+$upload_dir = "upload/news/";
+$thumb_dir = "upload/news/thumbnail/";
+
+if (!file_exists($upload_dir)) {
+    mkdir($upload_dir, 0777, true);
+}
+if (!file_exists($thumb_dir)) {
+    mkdir($thumb_dir, 0777, true);
+}
+
 $alert = '';
 
 // Hapus berita
@@ -23,7 +34,7 @@ if (isset($_GET['delete'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = $_POST['id'] ?? 0;
     $title = trim($_POST['title']);
-    $content = $_POST['content']; // langsung dari textarea
+    $content = $_POST['content'];
     $categories = $_POST['categories'] ?? ['Latest'];
     $categories_json = json_encode($categories);
     $author = trim($_POST['author']) ?: 'HoopWave Team';
@@ -36,23 +47,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_FILES['image']['name'])) {
         $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
         $filename = 'news-' . time() . '.' . $ext;
-        $target = "upload/news/" . $filename;
-        $thumb_target = "upload/news/thumbnail/thumb-" . $filename;
+        $target = $upload_dir . $filename;
+        $thumb_target = $thumb_dir . "thumb-" . $filename;
 
         if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
-            $src = imagecreatefromstring(file_get_contents($target));
-            $thumb = imagecreatetruecolor(600, 400);
-            imagecopyresampled($thumb, $src, 0, 0, 0, 0, 600, 400, imagesx($src), imagesy($src));
-            imagejpeg($thumb, $thumb_target, 85);
-            imagedestroy($src); imagedestroy($thumb);
+            
+            // Cek apakah GD extension aktif
+            if (extension_loaded('gd')) {
+                try {
+                    $src = imagecreatefromstring(file_get_contents($target));
+                    if ($src !== false) {
+                        $thumb = imagecreatetruecolor(600, 400);
+                        imagecopyresampled($thumb, $src, 0, 0, 0, 0, 600, 400, imagesx($src), imagesy($src));
+                        imagejpeg($thumb, $thumb_target, 85);
+                        imagedestroy($src); 
+                        imagedestroy($thumb);
+                        
+                        $thumbnail = $thumb_target;
+                    } else {
+                        // Jika gagal create image, pakai gambar asli
+                        $thumbnail = $target;
+                    }
+                } catch (Exception $e) {
+                    // Jika error, pakai gambar asli sebagai thumbnail
+                    $thumbnail = $target;
+                }
+            } else {
+                // Jika GD tidak aktif, pakai gambar asli sebagai thumbnail
+                $thumbnail = $target;
+                $alert = '<div class="alert alert-warning">GD extension tidak aktif. Thumbnail menggunakan gambar asli.</div>';
+            }
 
             $image = $target;
-            $thumbnail = $thumb_target;
 
-            if ($id && $_POST['old_image']) {
+            // Hapus gambar lama jika ada
+            if ($id && isset($_POST['old_image']) && file_exists($_POST['old_image'])) {
                 @unlink($_POST['old_image']);
+            }
+            if ($id && isset($_POST['old_thumbnail']) && file_exists($_POST['old_thumbnail'])) {
                 @unlink($_POST['old_thumbnail']);
             }
+        } else {
+            $alert = '<div class="alert alert-danger">Gagal upload gambar!</div>';
         }
     }
 
@@ -69,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($stmt->execute()) {
         $alert = '<div class="alert alert-success">Berita berhasil disimpan!</div>';
     } else {
-        $alert = '<div class="alert alert-danger">Gagal menyimpan berita.</div>';
+        $alert = '<div class="alert alert-danger">Gagal menyimpan berita: ' . $conn->error . '</div>';
     }
 }
 
@@ -98,7 +134,7 @@ $all_cats = ['Latest', 'Breaking News', 'Teams', 'Players', 'Analysis'];
         .btn-primary { background:#c8102e; border:none; border-radius:50px; padding:0.75rem 2rem; }
         .btn-primary:hover { background:#a00d24; }
         .btn-back { position:fixed; top:15px; left:20px; z-index:9999; background:#c8102e; color:white; border-radius:50px; padding:0.65rem 1.6rem; font-size:0.95rem; box-shadow:0 5px 15px rgba(200,16,46,0.35); text-decoration:none; }
-        .btn-back:hover { background:#a00d24; }
+        .btn-back:hover { background:#a00d24; color:white; }
         .preview-img { max-height:300px; object-fit:cover; border-radius:12px; }
         textarea#content { min-height:400px; font-size:1rem; }
     </style>
@@ -106,7 +142,7 @@ $all_cats = ['Latest', 'Breaking News', 'Teams', 'Players', 'Analysis'];
 <body>
 
 <a href="dashboard_admin.php" class="btn btn-back">
-    Kembali ke Dashboard
+    <i class="fas fa-arrow-left me-2"></i> Kembali ke Dashboard
 </a>
 
 <div class="container">
@@ -124,7 +160,7 @@ $all_cats = ['Latest', 'Breaking News', 'Teams', 'Players', 'Analysis'];
                 <?php endif; ?>
 
                 <div class="row g-4">
-                    <div class="col-md-8">
+                    <div class="col-md-12">
                         <label class="form-label fw-bold">Judul Berita</label>
                         <input type="text" name="title" class="form-control form-control-lg" value="<?= $edit['title']??'' ?>" required>
                     </div>
@@ -149,20 +185,20 @@ $all_cats = ['Latest', 'Breaking News', 'Teams', 'Players', 'Analysis'];
                     <div class="col-12">
                         <label class="form-label fw-bold">Isi Berita</label>
                         <textarea name="content" id="content" class="form-control" rows="15" required><?= $edit['content']??'' ?></textarea>
-                        <small class="text-muted">Bisa pakai tag HTML sederhana: &lt;b&gt;, &lt;i&gt;, &lt;p&gt;, &lt;br&gt;, &lt;img src="...">, dll</small>
+                        <small class="text-muted">Bisa pakai tag HTML sederhana: &lt;b&gt;, &lt;i&gt;, &lt;p&gt;, &lt;br&gt;, &lt;img src="..."&gt;, dll</small>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Gambar Utama (1920x1080 disarankan)</label>
                         <input type="file" name="image" class="form-control" accept="image/*" <?= $edit?'':'required' ?>>
                         <?php if ($edit && $edit['image']): ?>
-                            <img src="../<?= $edit['image'] ?>" class="img-fluid mt-3 preview-img" alt="">
+                            <img src="<?= $edit['image'] ?>" class="img-fluid mt-3 preview-img" alt="">
                         <?php endif; ?>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Thumbnail Otomatis (600x400)</label>
                         <?php if ($edit && $edit['thumbnail']): ?>
-                            <img src="../<?= $edit['thumbnail'] ?>" class="img-fluid mt-3 preview-img" alt="">
+                            <img src="<?= $edit['thumbnail'] ?>" class="img-fluid mt-3 preview-img" alt="">
                         <?php else: ?>
                             <p class="text-muted mt-3">Akan dibuat otomatis setelah upload</p>
                         <?php endif; ?>
@@ -176,7 +212,7 @@ $all_cats = ['Latest', 'Breaking News', 'Teams', 'Players', 'Analysis'];
 
                 <div class="mt-4 text-end">
                     <button type="submit" class="btn btn-primary px-5">
-                        <?= $edit ? 'Update' : 'Publish' ?> Berita
+                        <i class="fas fa-save me-2"></i> <?= $edit ? 'Update' : 'Publish' ?> Berita
                     </button>
                     <?php if($edit): ?>
                         <a href="admin_news.php" class="btn btn-secondary px-4">Batal</a>
@@ -186,7 +222,7 @@ $all_cats = ['Latest', 'Breaking News', 'Teams', 'Players', 'Analysis'];
         </div>
     </div>
 
-    <!-- Daftar Berita (tetap sama) -->
+    <!-- Daftar Berita -->
     <div class="card">
         <div class="card-body p-5">
             <h4 class="mb-4 text-primary">Daftar Semua Berita</h4>
@@ -202,7 +238,7 @@ $all_cats = ['Latest', 'Breaking News', 'Teams', 'Players', 'Analysis'];
                             $cats = json_decode($n['categories'], true);
                         ?>
                         <tr>
-                            <td><img src="../<?= $n['thumbnail'] ?>" width="70" class="rounded" alt=""></td>
+                            <td><img src="<?= $n['thumbnail'] ?>" width="70" class="rounded" alt=""></td>
                             <td class="fw-bold"><?= htmlspecialchars($n['title']) ?></td>
                             <td><?php foreach($cats as $c): ?><span class="badge bg-primary me-1"><?= $c ?></span><?php endforeach; ?></td>
                             <td><?= date('d M Y', strtotime($n['created_at'])) ?></td>
