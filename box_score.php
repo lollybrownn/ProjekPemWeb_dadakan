@@ -1,3 +1,19 @@
+<?php
+include "connection.php";
+
+if (!isset($_SESSION['loggedin'])) {
+    header("Location: login.php");
+    exit;
+}
+
+// Tanggal
+$selectedDate = $_GET['date'] ?? date('Y-m-d');
+$displayDate  = date('l, F j, Y', strtotime($selectedDate));
+
+$prev = date('Y-m-d', strtotime($selectedDate . ' -1 day'));
+$next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
