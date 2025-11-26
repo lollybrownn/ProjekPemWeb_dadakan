@@ -16,19 +16,19 @@ include "connection.php";
             background-repeat: no-repeat;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Mulai dari atas */
+            align-items: flex-start;
             min-height: 100vh;
             margin: 0;
-            padding-top: 50px; /* Jarak dari atas */
+            padding-top: 50px;
         }
 
         .login-container {
             width: 100%;
-            max-width: 450px; /* Lebar maksimal konten */
+            max-width: 450px;
             background-color: white;
             padding: 40px 30px;
             margin-bottom: 50px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sedikit bayangan */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             border-radius: 4px;
         }
 
@@ -43,8 +43,7 @@ include "connection.php";
         }
 
         .logo img {
-            /* Asumsikan Anda menggunakan logo NBA */
-            filter: invert(0); /* Pastikan logo berwarna gelap/hitam */
+            filter: invert(0);
         }
 
         .logo-id {
@@ -55,7 +54,7 @@ include "connection.php";
 
         h1 {
             font-size: 32px;
-            font-weight: 800; /* Ekstra bold */
+            font-weight: 800;
             color: #000;
             line-height: 1.1;
             margin-top: 0;
@@ -71,14 +70,12 @@ include "connection.php";
         }
 
         .instruction {
-            /* Gaya untuk meniru teks "Enter your email address to get started" */
             color: #000;
             font-weight: 500;
             margin-bottom: 25px;
         }
 
         .form-box {
-            /* Meniru tampilan kotak putih yang menampung form */
             padding: 0;
             border: none;
             background: none;
@@ -94,7 +91,6 @@ include "connection.php";
             font-size: 14px;
             color: #888;
             margin-bottom: 5px;
-            /* Meniru gaya label di atas input */
         }
 
         .input-group input {
@@ -102,7 +98,7 @@ include "connection.php";
             padding: 15px 10px;
             font-size: 16px;
             border: none;
-            border-bottom: 2px solid #ccc; /* Garis bawah yang menonjol */
+            border-bottom: 2px solid #ccc;
             box-sizing: border-box;
             outline: none;
             transition: border-bottom-color 0.3s;
@@ -110,12 +106,34 @@ include "connection.php";
         }
 
         .input-group input:focus {
-            border-bottom-color: #000; /* Garis bawah hitam saat fokus */
+            border-bottom-color: #000;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            margin-top: -10px;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            cursor: pointer;
+            accent-color: #000;
+        }
+
+        .remember-me label {
+            font-size: 14px;
+            color: #555;
+            cursor: pointer;
+            user-select: none;
         }
 
         .btn-continue {
             width: 100%;
-            background-color: #000; /* Warna tombol hitam */
+            background-color: #000;
             color: white;
             padding: 18px 20px;
             font-size: 18px;
@@ -128,7 +146,7 @@ include "connection.php";
         }
 
         .btn-continue:hover {
-            background-color: #333; /* Sedikit lebih terang saat hover */
+            background-color: #333;
         }
     </style>
 </head>
@@ -168,6 +186,11 @@ include "connection.php";
                 <div class="input-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" required placeholder="Masukkan Password">
+                </div>
+
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember" value="1">
+                    <label for="remember">Remember Me</label>
                 </div>
 
                 <button type="submit" class="btn-continue">
