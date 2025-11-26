@@ -23,14 +23,13 @@ if (isset($_GET['delete'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = $_POST['id'] ?? 0;
     $title = trim($_POST['title']);
-    $content = $_POST['content'];
-    $category = $_POST['category'];
+    $content = $_POST['content']; // langsung dari textarea
+    $categories = $_POST['categories'] ?? ['Latest'];
+    $categories_json = json_encode($categories);
     $author = trim($_POST['author']) ?: 'HoopWave Team';
 
-    // Slug otomatis
     $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $title) . '-' . time());
 
-    // Upload gambar utama
     $image = $_POST['old_image'] ?? '';
     $thumbnail = $_POST['old_thumbnail'] ?? '';
     
@@ -41,21 +40,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $thumb_target = "upload/news/thumbnail/thumb-" . $filename;
 
         if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
-            // Buat thumbnail otomatis
             $src = imagecreatefromstring(file_get_contents($target));
-            $width = imagesx($src);
-            $height = imagesy($src);
-            $new_width = 600;
-            $new_height = 400;
-            $thumb = imagecreatetruecolor($new_width, $new_height);
-            imagecopyresampled($thumb, $src, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+            $thumb = imagecreatetruecolor(600, 400);
+            imagecopyresampled($thumb, $src, 0, 0, 0, 0, 600, 400, imagesx($src), imagesy($src));
             imagejpeg($thumb, $thumb_target, 85);
             imagedestroy($src); imagedestroy($thumb);
 
             $image = $target;
             $thumbnail = $thumb_target;
 
-            // Hapus gambar lama kalau edit
             if ($id && $_POST['old_image']) {
                 @unlink($_POST['old_image']);
                 @unlink($_POST['old_thumbnail']);
@@ -64,13 +57,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($id > 0) {
-        $sql = "UPDATE news SET title=?, slug=?, content=?, image=?, thumbnail=?, category=?, author=? WHERE id=?";
+        $sql = "UPDATE news SET title=?, slug=?, content=?, image=?, thumbnail=?, categories=?, author=? WHERE id=?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssssssi", $title, $slug, $content, $image, $thumbnail, $category, $author, $id);
+        $stmt->bind_param("sssssssi", $title, $slug, $content, $image, $thumbnail, $categories_json, $author, $id);
     } else {
-        $sql = "INSERT INTO news (title, slug, content, image, thumbnail, category, author) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO news (title, slug, content, image, thumbnail, categories, author) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssssss", $title, $slug, $content, $image, $thumbnail, $category, $author);
+        $stmt->bind_param("sssssss", $title, $slug, $content, $image, $thumbnail, $categories_json, $author);
     }
 
     if ($stmt->execute()) {
@@ -80,13 +73,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Edit mode
 $edit = null;
 if (isset($_GET['edit'])) {
     $id = (int)$_GET['edit'];
     $res = $conn->query("SELECT * FROM news WHERE id = $id");
     $edit = $res->fetch_assoc();
 }
+
+$all_cats = ['Latest', 'Breaking News', 'Teams', 'Players', 'Analysis'];
 ?>
 
 <!DOCTYPE html>
@@ -97,26 +91,28 @@ if (isset($_GET['edit'])) {
     <title>Kelola Berita - Admin HoopWave</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <style>
-        body { background:#f8f9fa; padding-top:120px; font-family:'Helvetica Neue',Arial,sans-serif; }
+        body { background:#f8f9fa; padding-top:100px; font-family:'Helvetica Neue',Arial,sans-serif; }
         .card { border:none; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.08); }
         .form-control, .form-select { border-radius:12px; }
         .btn-primary { background:#c8102e; border:none; border-radius:50px; padding:0.75rem 2rem; }
         .btn-primary:hover { background:#a00d24; }
+        .btn-back { position:fixed; top:15px; left:20px; z-index:9999; background:#c8102e; color:white; border-radius:50px; padding:0.65rem 1.6rem; font-size:0.95rem; box-shadow:0 5px 15px rgba(200,16,46,0.35); text-decoration:none; }
+        .btn-back:hover { background:#a00d24; }
         .preview-img { max-height:300px; object-fit:cover; border-radius:12px; }
-        .table thead { background:#f1f1f1; }
+        textarea#content { min-height:400px; font-size:1rem; }
     </style>
 </head>
 <body>
 
-<?php include "navbar.php"; ?>
+<a href="dashboard_admin.php" class="btn btn-back">
+    Kembali ke Dashboard
+</a>
 
 <div class="container">
     <h2 class="text-center mb-4 fw-bold text-dark">Kelola Berita & Artikel</h2>
     <?= $alert ?>
 
-    <!-- Form Tambah/Edit -->
     <div class="card mb-5">
         <div class="card-body p-5">
             <h4 class="mb-4 text-primary"><?= $edit ? 'Edit Berita' : 'Tambah Berita Baru' ?></h4>
@@ -130,39 +126,45 @@ if (isset($_GET['edit'])) {
                 <div class="row g-4">
                     <div class="col-md-8">
                         <label class="form-label fw-bold">Judul Berita</label>
-                        <input type="text" name="title" class="form-control form-control-lg" 
-                               value="<?= $edit['title']??'' ?>" required>
+                        <input type="text" name="title" class="form-control form-control-lg" value="<?= $edit['title']??'' ?>" required>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Kategori</label>
-                        <select name="category" class="form-select" required>
-                            <option value="News" <?= ($edit['category']??'')=='News'?'selected':'' ?>>News</option>
-                            <option value="Highlights" <?= ($edit['category']??'')=='Highlights'?'selected':'' ?>>Highlights</option>
-                            <option value="Trade" <?= ($edit['category']??'')=='Trade'?'selected':'' ?>>Trade</option>
-                            <option value="Injury" <?= ($edit['category']??'')=='Injury'?'selected':'' ?>>Injury</option>
-                            <option value="Rumor" <?= ($edit['category']??'')=='Rumor'?'selected':'' ?>>Rumor</option>
-                            <option value="Opinion" <?= ($edit['category']??'')=='Opinion'?'selected':'' ?>>Opinion</option>
-                        </select>
+
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Kategori (bisa pilih lebih dari satu)</label>
+                        <div class="row g-3">
+                            <?php 
+                            $selected = $edit ? json_decode($edit['categories'], true) : ['Latest'];
+                            foreach($all_cats as $cat): ?>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="categories[]" value="<?= $cat ?>" 
+                                               id="cat_<?=strtolower(str_replace(' ','',$cat))?>" <?=in_array($cat,$selected)?'checked':''?>>
+                                        <label class="form-check-label" for="cat_<?=strtolower(str_replace(' ','',$cat))?>"><?= $cat ?></label>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
 
                     <div class="col-12">
                         <label class="form-label fw-bold">Isi Berita</label>
-                        <textarea name="content" id="editor"><?= $edit['content']??'' ?></textarea>
+                        <textarea name="content" id="content" class="form-control" rows="15" required><?= $edit['content']??'' ?></textarea>
+                        <small class="text-muted">Bisa pakai tag HTML sederhana: &lt;b&gt;, &lt;i&gt;, &lt;p&gt;, &lt;br&gt;, &lt;img src="...">, dll</small>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Gambar Utama (1920x1080 disarankan)</label>
                         <input type="file" name="image" class="form-control" accept="image/*" <?= $edit?'':'required' ?>>
                         <?php if ($edit && $edit['image']): ?>
-                            <img src="../<?= $edit['image'] ?>" class="img-fluid mt-3 preview-img" alt="Current">
+                            <img src="../<?= $edit['image'] ?>" class="img-fluid mt-3 preview-img" alt="">
                         <?php endif; ?>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Thumbnail Otomatis (600x400)</label>
                         <?php if ($edit && $edit['thumbnail']): ?>
-                            <img src="../<?= $edit['thumbnail'] ?>" class="img-fluid mt-3 preview-img" alt="Thumbnail">
+                            <img src="../<?= $edit['thumbnail'] ?>" class="img-fluid mt-3 preview-img" alt="">
                         <?php else: ?>
-                            <p class="text-muted mt-3">Akan otomatis dibuat setelah upload gambar</p>
+                            <p class="text-muted mt-3">Akan dibuat otomatis setelah upload</p>
                         <?php endif; ?>
                     </div>
 
@@ -174,7 +176,7 @@ if (isset($_GET['edit'])) {
 
                 <div class="mt-4 text-end">
                     <button type="submit" class="btn btn-primary px-5">
-                        <i class="fas fa-save"></i> <?= $edit ? 'Update' : 'Publish' ?> Berita
+                        <?= $edit ? 'Update' : 'Publish' ?> Berita
                     </button>
                     <?php if($edit): ?>
                         <a href="admin_news.php" class="btn btn-secondary px-4">Batal</a>
@@ -184,35 +186,29 @@ if (isset($_GET['edit'])) {
         </div>
     </div>
 
-    <!-- Daftar Berita -->
+    <!-- Daftar Berita (tetap sama) -->
     <div class="card">
         <div class="card-body p-5">
             <h4 class="mb-4 text-primary">Daftar Semua Berita</h4>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
-                        <tr>
-                            <th width="80">Gambar</th>
-                            <th>Judul</th>
-                            <th>Kategori</th>
-                            <th>Tanggal</th>
-                            <th width="120">Aksi</th>
-                        </tr>
+                        <tr><th>Gambar</th><th>Judul</th><th>Kategori</th><th>Tanggal</th><th>Aksi</th></tr>
                     </thead>
                     <tbody>
                         <?php
                         $res = $conn->query("SELECT * FROM news ORDER BY created_at DESC");
                         while($n = $res->fetch_assoc()):
+                            $cats = json_decode($n['categories'], true);
                         ?>
                         <tr>
                             <td><img src="../<?= $n['thumbnail'] ?>" width="70" class="rounded" alt=""></td>
                             <td class="fw-bold"><?= htmlspecialchars($n['title']) ?></td>
-                            <td><span class="badge bg-primary"><?= $n['category'] ?></span></td>
+                            <td><?php foreach($cats as $c): ?><span class="badge bg-primary me-1"><?= $c ?></span><?php endforeach; ?></td>
                             <td><?= date('d M Y', strtotime($n['created_at'])) ?></td>
                             <td>
                                 <a href="?edit=<?= $n['id'] ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
-                                <a href="?delete=<?= $n['id'] ?>" class="btn btn-danger btn-sm" 
-                                   onclick="return confirm('Yakin hapus berita ini?')"><i class="fas fa-trash"></i></a>
+                                <a href="?delete=<?= $n['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')"><i class="fas fa-trash"></i></a>
                             </td>
                         </tr>
                         <?php endwhile; ?>
@@ -224,14 +220,5 @@ if (isset($_GET['edit'])) {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-tinymce.init({
-    selector: '#editor',
-    height: 500,
-    plugins: 'lists link image table code fullscreen',
-    toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code fullscreen',
-    branding: false
-});
-</script>
 </body>
 </html>

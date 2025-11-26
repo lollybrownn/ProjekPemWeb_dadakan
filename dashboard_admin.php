@@ -97,7 +97,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'admin') {
 <!-- Navbar Admin -->
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-admin">
     <div class="container-fluid">
-        <a class="navbar-brand fw-bold fs-4" href="admin_dashboard.php">
+        <a class="navbar-brand fw-bold fs-4" href="dashboard_admin.php">
             <i class="fas fa-shield-alt me-2"></i> Admin Panel
         </a>
         <div class="d-flex align-items-center gap-3">
@@ -105,8 +105,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'admin') {
                 <i class="fas fa-user-shield me-2"></i>
                 Hi, <?= htmlspecialchars($_SESSION['nama']) ?>
             </span>
-            <a href="logout.php" class="btn btn-outline-light btn-sm px-4">
-                <i class="fas fa-sign-out-alt me-1"></i> Logout
+            <a href="admin_logout.php" class="btn btn-outline-light btn-sm px-4">
+                Logout
             </a>
         </div>
     </div>
