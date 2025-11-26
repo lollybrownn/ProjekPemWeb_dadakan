@@ -1,12 +1,17 @@
 <?php
 include "connection.php";
-date_default_timezone_set('Asia/Jakarta');
 
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+if (!isset($_SESSION['loggedin'])) {
     header("Location: login.php");
     exit;
 }
-$nama = htmlspecialchars($_SESSION['nama']);
+
+// Tanggal
+$selectedDate = $_GET['date'] ?? date('Y-m-d');
+$displayDate  = date('l, F j, Y', strtotime($selectedDate));
+
+$prev = date('Y-m-d', strtotime($selectedDate . ' -1 day'));
+$next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
 ?>
 
 <!DOCTYPE html>
