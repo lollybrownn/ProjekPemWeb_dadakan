@@ -94,7 +94,6 @@ $next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
             overflow: visible;
         }
 
-        /* Logo + nama tim rapi */
         .team-item {
             display: flex !important;
             align-items: center;

@@ -41,8 +41,6 @@ $next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
         .game-header h1 { font-size:2.8rem; font-weight:900; letter-spacing:1px; }
         .score-win { color:#28a745; }
         .score-lose { color:#dc3545; }
-
-        /* BOX SCORE TABLE – NBA.COM STYLE 2025 */
         .boxscore-card {
             background:#111;
             border-radius:16px;
