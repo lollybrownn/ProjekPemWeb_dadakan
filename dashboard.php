@@ -23,6 +23,7 @@ $nama = htmlspecialchars($_SESSION['nama']);
             background-position: center;
             background-repeat: no-repeat;
             background-color: transparent !important;
+            background-size: cover;
         }
         
         .teams-dropdown {

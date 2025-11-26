@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm fixed-top navbar-main">
+<nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm fixed-top navbar-main z-50">
         <div class="container-fluid">
             <a class="navbar-brand" href="dashboard.php">
                 <img src="asset/logobaru.png" alt="HoopWave" width="200" height="80">
