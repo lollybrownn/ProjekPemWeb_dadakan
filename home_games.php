@@ -23,7 +23,7 @@ $next = date('Y-m-d', strtotime($selectedDate . ' +1 day'));
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background:#f9f9f9; padding-top:170px; font-family:'Helvetica Neue',Arial,sans-serif; }
-        .navbar-main { background-image:url(asset/background-navbar.png); background-size:cover; background-position:center; }
+        .navbar-main { background-image:url(asset/background-navbar1.png); background-position:center; background-repeat: no-repeat;}
         #subNavbar { background:#fff !important; border-bottom:1px solid #ddd; }
         .game-wrapper {
             background:#fff;

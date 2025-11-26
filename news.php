@@ -18,7 +18,7 @@ $nama = htmlspecialchars($_SESSION['nama']);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background:#f9f9f9; font-family:'Helvetica Neue',Arial,sans-serif; padding-top:170px; color:#333; }
-        .navbar-main { z-index:1050 !important; background-image:url(asset/background-navbar.png); background-size:cover; background-position:center; background-repeat:no-repeat; }
+        .navbar-main { z-index:1050 !important; background-image:url(asset/background-navbar1.png); background-position:center; background-repeat:no-repeat; }
         #subNavbar { z-index:1040 !important; background:#fff !important; border-bottom:1px solid #e0e0e0; position:fixed; left:0; right:0; }
         .sub-nav-item { color:#666; font-weight:500; padding:0.75rem 1rem; border-bottom:2px solid transparent; text-decoration:none; transition:all .3s; }
         .sub-nav-item:hover, .sub-nav-item.active { color:#000; border-bottom-color:#c8102e; background:#f8f9fa; }

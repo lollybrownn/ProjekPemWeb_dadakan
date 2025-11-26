@@ -19,8 +19,7 @@ $nama = htmlspecialchars($_SESSION['nama']);
     <style>
         /* Hanya dropdown Teams yang lebar + scrollable */
         .navbar-main {
-            background-image: url(asset/background-navbar.png);
-            background-size: cover;
+            background-image: url(asset/background-navbar1.png);
             background-position: center;
             background-repeat: no-repeat;
             background-color: transparent !important;
