@@ -46,6 +46,80 @@ $video = $conn->query("
         footer a { color: #ddd; text-decoration: none; }
         footer a:hover { color: #c8102e; }
         .footer-title { color: white; font-weight: 700; }
+        body { background:#f9f9f9; padding-top:170px; font-family:'Helvetica Neue',Arial,sans-serif; }
+        .navbar-main { background-image:url(asset/background-navbar1.png); background-position:center; background-repeat: no-repeat;}
+        #subNavbar { background:#fff !important; border-bottom:1px solid #ddd; }
+        .game-wrapper {
+            background:#fff;
+            border-radius:16px;
+            box-shadow:0 8px 30px rgba(0,0,0,0.1);
+            overflow:hidden;
+            margin-bottom:3rem;
+        }
+        .team-logo { width:72px; height:72px; }
+        .score-big { font-size:3.5rem; font-weight:900; line-height:1; }
+        .final-text { font-size:1.1rem; font-weight:700; color:#000; }
+        .leader-img { width:60px; height:60px; border-radius:50%; object-fit:cover; border:3px solid #eee; }
+        .btn-outline-dark { border-radius:50px; }
+        .navbar-main {
+            background-image: url(asset/background-navbar1.png);
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: transparent !important;
+            background-size: cover;
+        }
+        
+        .teams-dropdown {
+            width: 360px !important;
+            /* khusus Teams saja */
+            max-height: 80vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0.5rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Dropdown lain (Games, dll) tetap normal */
+        .dropdown-menu:not(.teams-dropdown) {
+            width: auto;
+            max-height: none;
+            overflow: visible;
+        }
+
+        /* Logo + nama tim rapi */
+        .team-item {
+            display: flex !important;
+            align-items: center;
+            gap: 12px;
+            padding: 0.45rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .team-item img {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .team-item:hover {
+            background-color: #f8f9fa;
+            color: #0d6efd !important;
+            border-radius: 6px;
+        }
+
+        .dropdown-header {
+            padding-left: 1.5rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1a1a1a;
+        }
+
+        /* Hover buka dropdown di desktop (lebih smooth) */
+        @media (min-width: 992px) {
+            .dropdown:hover>.dropdown-menu {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
@@ -55,7 +129,7 @@ $video = $conn->query("
 <!-- SELAMAT DATANG + VIDEO HIGHLIGHT (PAKAI IFRAME LANGSUNG) -->
 <div class="welcome-section text-center">
     <div class="container">
-        <h1 class="display-4 fw-bold text-dark mb-3">Selamat Datang, <?= $nama ?>!</h1>
+        <h1 class="display-4 fw-bold text-dark mb-3">Selamat Datang!</h1>
         <p class="lead text-muted mb-5">Portal NBA terlengkap untuk penggemar basket Indonesia</p>
 
         <!-- VIDEO HIGHLIGHT DENGAN IFRAME -->
@@ -94,7 +168,7 @@ $video = $conn->query("
                 <div class="card-icon mb-4"><i class="fas fa-basketball-ball"></i></div>
                 <h3 class="fw-bold mb-3">Jadwal & Skor</h3>
                 <p class="text-muted mb-4">Live score, highlight video, box score, dan jadwal pertandingan NBA lengkap</p>
-                <a href="games.php" class="btn btn-hoop text-white">Lihat Jadwal</a>
+                <a href="home_games.php" class="btn btn-hoop text-white">Lihat Jadwal</a>
             </div>
         </div>
         <div class="col-lg-5">
@@ -138,7 +212,7 @@ $video = $conn->query("
             <div class="col-lg-3">
                 <h5 class="footer-title">Pintasan</h5>
                 <ul class="list-unstyled small">
-                    <li><a href="games.php">Jadwal & Skor</a></li>
+                    <li><a href="home_games.php">Jadwal & Skor</a></li>
                     <li><a href="news.php">Berita NBA</a></li>
                     <li><a href="logout.php">Logout</a></li>
                 </ul>

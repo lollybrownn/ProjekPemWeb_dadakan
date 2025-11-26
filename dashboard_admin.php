@@ -161,8 +161,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'admin') {
 
     <div class="text-center mt-5 pt-4">
         <small class="text-muted">
-            HoopWave Admin Panel © 2025 • Dibuat dengan 
-            <i class="fas fa-heart text-danger"></i> untuk NBA Fans Indonesia
+            HoopWave Admin Panel © 2025 • Dibuat untuk NBA Fans Indonesia
         </small>
     </div>
 </div>
