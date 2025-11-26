@@ -22,7 +22,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['nama'] = $user['nama'];
-            $_SESSION['role'] = $user['role']; // ini kuncinya!
+            $_SESSION['role'] = $user['role'];
+
+            // Handle Remember Me
+            if (isset($_POST['remember']) && $_POST['remember'] == '1') {
+                // Set cookie untuk 30 hari
+                $cookie_time = time() + (86400 * 30); // 86400 detik = 1 hari
+                
+                // Simpan email
+                setcookie('remember_email', $email, $cookie_time, '/');
+                
+                // Simpan token unik untuk keamanan (jangan simpan password asli!)
+                $remember_token = bin2hex(random_bytes(32)); // Generate token random
+                setcookie('remember_token', $remember_token, $cookie_time, '/');
+                
+                // Simpan token ke database untuk validasi nanti
+                $update_token = "UPDATE users SET remember_token = ? WHERE id = ?";
+                $stmt_token = $conn->prepare($update_token);
+                $stmt_token->bind_param("si", $remember_token, $user['id']);
+                $stmt_token->execute();
+                $stmt_token->close();
+                
+            } else {
+                // Hapus cookie jika user tidak centang remember me
+                if (isset($_COOKIE['remember_email'])) {
+                    setcookie('remember_email', '', time() - 3600, '/');
+                }
+                if (isset($_COOKIE['remember_token'])) {
+                    setcookie('remember_token', '', time() - 3600, '/');
+                }
+                
+                // Hapus token dari database
+                $clear_token = "UPDATE users SET remember_token = NULL WHERE id = ?";
+                $stmt_clear = $conn->prepare($clear_token);
+                $stmt_clear->bind_param("i", $user['id']);
+                $stmt_clear->execute();
+                $stmt_clear->close();
+            }
 
             // Arahkan berdasarkan role
             if ($user['role'] === 'admin') {
